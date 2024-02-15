@@ -1,7 +1,3 @@
-void sph1()
-
-{
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -75,5 +71,3 @@ for el in range(el_max+1):
 plt.tight_layout()
 plt.savefig('sph_harm.png')
 plt.show()
-
-}
