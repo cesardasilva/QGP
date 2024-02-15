@@ -142,8 +142,8 @@ ifeq ($(ROOT_USE),true)
 else
 	$(error Error: $@ requires ROOT)
 endif
-main92: $(PYTHIA) $$@.cc main92.so
-	$(CXX) $@.cc main92.so -o $@ -w $(CXX_COMMON) -Wl,-rpath,./\
+PythiaEventGEN: $(PYTHIA) $$@.cc PythiaEventGEN.so
+	$(CXX) $@.cc PythiaEventGEN.so -o $@ -w $(CXX_COMMON) -Wl,-rpath,./\
 	 `$(ROOT_CONFIG) --cflags --glibs`
 
 # RIVET with optional ROOT (if RIVET, use C++14).
