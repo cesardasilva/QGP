@@ -28,10 +28,10 @@ int main() {
   Pythia pythia;
   pythia.readString("HardQCD:all = on");
   pythia.readString("PhaseSpace:pTHatMin = 2.");
-  pythia.readString("Beams:idA = 1000822080");
-  pythia.readString("Beams:idB = 1000822080"); // The lead ion.
+  //pythia.readString("Beams:idA = 1000822080");
+  //pythia.readString("Beams:idB = 1000822080"); // The lead ion.
   pythia.readString("Beams:eCM = 200.");
-  pythia.readString("HeavyIon:SigFitNGen = 20");
+  //pythia.readString("HeavyIon:SigFitNGen = 20");
   pythia.init();
 
   // Set up the ROOT TFile and TTree.
@@ -39,6 +39,9 @@ int main() {
   Event *event = &pythia.event;
   TTree *T = new TTree("T","charged particles");
   int evtn = 0;
+  int npart = 0;
+  float impact_param = 9999.;
+  int ncoll = 0;
   int npart = 0;
   float Vx = -999.;
   float Vy = -999.;
@@ -53,10 +56,15 @@ int main() {
   vector<float> eta;
   vector<float> phi;
   vector<int> pid;
+  vector<int> parent1_pid;
+  vector<int> parent2_pid;
   float phi_max = -999.0;
   float eta_max = -999.0;
   float pt_max = -999.0;
   T->Branch("evtn",&evtn,"evtn/I");
+  T->Branch("npart",&npart,"npart/I");
+  T->Branch("impact_param",&impact_param,"impact_param/F");
+  T->Branch("ncoll",&ncoll,"ncoll/I");
   T->Branch("npart",&npart,"npart/I");
   T->Branch("Vx",&Vx,"Vx/F");  
   T->Branch("Vy",&Vy,"Vy/F");
@@ -74,13 +82,19 @@ int main() {
   T->Branch("eta",&eta);//,"eta[npart]/F");
   T->Branch("phi",&phi);//,"phi[npart]/F");
   T->Branch("pid",&pid);//,"pid[npart]/I");
-  
+  T->Branch("parent1_pid",&parent1_pid);
+  T->Branch("parent2_pid",&parent2_pid);
+
  // Begin event loop. Generate event; skip if generation aborted.
   for (evtn = 0; evtn < 1000; ++evtn) {
     if (!pythia.next()) continue;
     int ntotpart = pythia.event.size();
-    npart = 0;
+    npart = ntotpart;
+    impact_param = pythia.HIInfo.b();
+    ncoll = pythia.HIInfo.nCollTot();
+    npart = pythia.HIInfo.nPartProj();
     pid.clear();
+    parent_pid.clear();
     pz.clear();
     pt.clear();
     eta.clear();
@@ -95,6 +109,10 @@ int main() {
 	if (!pythia.event[i].isCharged()) continue;
 	if (pythia.event[i].pT()<0.060) continue;
 	pid.push_back(pythia.event[i].id());
+	int mother1 = pythia.event[i].mother1();
+	int mother2 = pythia.event[i].mother2();
+	parent1_pid.push_back(pythia.event[mother1].id());
+	parent2_pid.push_back(pythia.event[mother2].id());
 	pz.push_back(pythia.event[i].pz());
 	pt.push_back(pythia.event[i].pT());
 	eta.push_back(pythia.event[i].eta());
